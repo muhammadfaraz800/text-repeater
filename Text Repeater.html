@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Repeater</title>
+    <style>
+        :root {
+            --bg-color-light: #f0f0f0;
+            --text-color-light: #000;
+            --container-bg-light: #fff;
+            --container-shadow-light: rgba(0, 0, 0, 0.1);
+            --button-bg-light: #007bff;
+            --button-bg-light-hover: #0056b3;
+            --button-copy-bg-light: #28a745;
+            --button-copy-bg-light-hover: #218838;
+
+            --bg-color-dark: #121212;
+            --text-color-dark: #e0e0e0;
+            --container-bg-dark: #1e1e1e;
+            --container-shadow-dark: rgba(255, 255, 255, 0.1);
+            --button-bg-dark: #1a73e8;
+            --button-bg-dark-hover: #185abc;
+            --button-copy-bg-dark: #34a853;
+            --button-copy-bg-dark-hover: #2c7d43;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: var(--bg-color-light);
+            color: var(--text-color-light);
+            transition: background-color 0.3s, color 0.3s;
+            position: relative;
+        }
+        .container {
+            width: 360px;
+            padding: 30px;
+            background-color: var(--container-bg-light);
+            box-shadow: 0 4px 12px var(--container-shadow-light);
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s, color 0.3s;
+        }
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px var(--container-shadow-light);
+        }
+        h1, h2 {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+        input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s, outline 0.3s;
+        }
+        button:focus {
+            outline: 3px solid #80bdff;
+            outline-offset: 2px;
+        }
+        #generate-button {
+            background-color: var(--button-bg-light);
+            color: white;
+            margin-top: 10px;
+        }
+        #generate-button:hover {
+            background-color: var(--button-bg-light-hover);
+        }
+        #copy-button {
+            background-color: var(--button-copy-bg-light);
+            color: white;
+            margin-top: 10px;
+        }
+        #copy-button:hover {
+            background-color: var(--button-copy-bg-light-hover);
+        }
+        #output {
+            height: 120px;
+            resize: none;
+            font-size: 14px;
+        }
+        .toggle-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .dark-theme {
+            background-color: var(--bg-color-dark);
+            color: var(--text-color-dark);
+        }
+        .dark-theme .container {
+            background-color: var(--container-bg-dark);
+            box-shadow: 0 4px 12px var(--container-shadow-dark);
+        }
+        .dark-theme .container:hover {
+            box-shadow: 0 6px 15px var(--container-shadow-dark);
+        }
+        .dark-theme #generate-button {
+            background-color: var(--button-bg-dark);
+        }
+        .dark-theme #generate-button:hover {
+            background-color: var(--button-bg-dark-hover);
+        }
+        .dark-theme #copy-button {
+            background-color: var(--button-copy-bg-dark);
+        }
+        .dark-theme #copy-button:hover {
+            background-color: var(--button-copy-bg-dark-hover);
+        }
+    </style>
+</head>
+<body>
+    <div class="toggle-container">
+        <label class="toggle-switch">
+            <input type="checkbox" id="theme-toggle" onclick="toggleTheme()">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div class="container">
+        <h1>Text Repeater</h1>
+        <label for="text">Enter text:</label>
+        <input type="text" id="text" placeholder="Enter text">
+        <label for="times">Number of times:</label>
+        <input type="number" id="times" min="1" value="1">
+        <button id="generate-button" onclick="repeatText()">Generate</button>
+        <h2>Output</h2>
+        <textarea id="output" readonly></textarea>
+        <button id="copy-button" onclick="copyText()">Copy</button>
+    </div>
+
+    <script>
+        function repeatText() {
+            const text = document.getElementById("text").value;
+            const times = parseInt(document.getElementById("times").value, 10);
+            let output = "";
+
+            for (let i = 0; i < times; i++) {
+                output += text + "\n";
+            }
+
+            document.getElementById("output").value = output;
+        }
+
+        function copyText() {
+            const outputTextarea = document.getElementById("output");
+            outputTextarea.select();
+            outputTextarea.setSelectionRange(0, 99999); // For mobile devices
+
+            try {
+                const successful = document.execCommand('copy');
+                const msg = successful ? 'successful' : 'unsuccessful';
+                console.log('Copying text command was ' + msg);
+            } catch (err) {
+                console.error('Oops, unable to copy', err);
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+        }
+    </script>
+</body>
+</html>
